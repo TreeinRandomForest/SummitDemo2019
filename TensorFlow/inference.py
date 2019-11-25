@@ -100,20 +100,50 @@ def show_inference(model, image_path):
   return image_np
 
   # List of the strings that is used to add correct label for each box.
-PATH_TO_LABELS = 'models/research/object_detection/data/mscoco_label_map.pbtxt'
-#PATH_TO_LABELS = 'workspace/training_demo/annotations/label_map.pbtxt'
+#PATH_TO_LABELS = 'models/research/object_detection/data/mscoco_label_map.pbtxt'
+PATH_TO_LABELS = 'workspace/training_demo/annotations/label_map.pbtxt'
 category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS, use_display_name=True)
 
 # If you want to test the code with your images, just add path to the images to the TEST_IMAGE_PATHS.
-PATH_TO_TEST_IMAGES_DIR = pathlib.Path('models/research/object_detection/test_images')
-#PATH_TO_TEST_IMAGES_DIR = pathlib.Path('/home/sanjay/TensorFlow/workspace/training_demo/images/test')
-TEST_IMAGE_PATHS = sorted(list(PATH_TO_TEST_IMAGES_DIR.glob("*.jpg")))
-#TEST_IMAGE_PATHS = sorted(list(PATH_TO_TEST_IMAGES_DIR.glob("*.png")))
+#PATH_TO_TEST_IMAGES_DIR = pathlib.Path('models/research/object_detection/test_images')
+PATH_TO_TEST_IMAGES_DIR = pathlib.Path('/home/sanjay/TensorFlow/workspace/training_demo/images/test')
+#TEST_IMAGE_PATHS = sorted(list(PATH_TO_TEST_IMAGES_DIR.glob("*.jpg")))
+TEST_IMAGE_PATHS = sorted(list(PATH_TO_TEST_IMAGES_DIR.glob("*.png")))
 
-model_name = 'ssd_mobilenet_v1_coco_2017_11_17'
-detection_model = load_model(model_name)
-#model_name = 'workspace/training_demo/trained-inference-graphs/output_inference_graph-3500.pb/saved_model'
-#detection_model = load_local_model(model_name)
+#model_name = 'ssd_mobilenet_v1_coco_2017_11_17'
+#detection_model = load_model(model_name)
+model_name = 'workspace/training_demo/trained-inference-graphs/output_inference_graph-4868.p4b/saved_model'
+detection_model = load_local_model(model_name)
 
-for image_path in TEST_IMAGE_PATHS[0:2]:
-  show_inference(detection_model, image_path)
+
+SAVE_PATH = 'workspace/training_demo/images/test_inference'
+
+def create_bbox_image(model, image_path, save_path = None):
+  #read image
+  image_np = np.array(Image.open(image_path))
+
+  #make prediction
+  output_dict = run_inference_for_single_image(model, image_np)
+
+  #visualize bounding boxes
+  image_box = vis_util.visualize_boxes_and_labels_on_image_array(image_np, output_dict['detection_boxes'], output_dict['detection_classes'], \
+                                                                 output_dict['detection_scores'], category_index, instance_masks=output_dict.get('detection_masks_reframed', None), \
+                                                                 use_normalized_coordinates=True, line_thickness=8)  
+
+
+  if save_path is not None:
+    save_name = str(image_path).split('/')[-1]
+    Image.fromarray(image_box).save(f'{save_path}/{save_name}')
+
+  return output_dict
+
+
+def save_all_bboxes(model, image_paths, save_path):
+  for path in image_paths:
+    try:
+      create_bbox_image(detection_model, path, save_path)
+    except:
+      print("Issue")
+
+#venv
+#python models/research/object_detection/export_inference_graph.py --input_type image_tensor --pipeline_config_path workspace/training_demo/training/ssd.config --trained_checkpoint_prefix workspace/training_demo/training/model.ckpt-48684 --output_directory workspace/training_demo/trained-inference-graphs/output_inference_graph-48684.pb/      
