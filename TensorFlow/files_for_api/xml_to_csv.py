@@ -29,10 +29,12 @@ def xml_to_csv(path):
 
     xml_list = []
     for xml_file in glob.glob(path + '/*.xml'):
+        filename = xml_file.split('/')[-1]
         tree = ET.parse(xml_file)
         root = tree.getroot()
         for member in root.findall('object'):
-            value = (root.find('filename').text,
+            value = (filename,
+                    #root.find('filename').text,
                     int(root.find('size')[0].text),
                     int(root.find('size')[1].text),
                     member[0].text,
