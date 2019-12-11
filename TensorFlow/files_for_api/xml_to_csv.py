@@ -27,13 +27,18 @@ def xml_to_csv(path):
         The produced dataframe
     """
 
+#changed filenames manually to avoid collisions
+# -> have to pick correct filenames here
+# -> correct filename comes from loop over paths but xml -> file extension (jpg or png)
+
     xml_list = []
     for xml_file in glob.glob(path + '/*.xml'):
-        filename = xml_file.split('/')[-1]
+        filename = xml_file.split('/')[-1] #xml file
+
         tree = ET.parse(xml_file)
         root = tree.getroot()
         for member in root.findall('object'):
-            value = (filename,
+            value = (filename.replace('xml', root.find('filename').text.split('.')[-1]),
                     #root.find('filename').text,
                     int(root.find('size')[0].text),
                     int(root.find('size')[1].text),
