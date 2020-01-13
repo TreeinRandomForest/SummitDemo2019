@@ -1,5 +1,6 @@
 #### Create and activate a virtualenv
 `virtualenv -p python3 $HOME/tmp/deepspeech-venv/`
+
 `source $HOME/tmp/deepspeech-venv/bin/activate`
 
 #### Install DeepSpeech
@@ -14,5 +15,6 @@
 
 #### Transcribe audio file and output dollar value
 `text=$(deepspeech --model deepspeech-0.6.1-models/output_graph.pbmm --lm deepspeech-0.6.1-models/lm.binary --trie deepspeech-0.6.1-models/trie --audio my_audio_file.wav)` 
+
 `python text2value.py --value="$text"`
 
