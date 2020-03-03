@@ -24,14 +24,12 @@ import image_utils
 # Patch the location of gfile
 tf.gfile = tf.io.gfile
 
-
 #png vs jpg
 FILE_FORMAT = config.IMAGE_COORDINATES.FILE_FORMAT
 
 #label locations
 PATH_TO_LABELS = config.MODEL_COORDINATES.PATH_TO_LABELS
 category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS, use_display_name=True)
-
 
 #train and test images
 PATH_TO_TRAIN_IMAGES_DIR = config.IMAGE_COORDINATES.PATH_TO_TRAIN_IMAGES_DIR
@@ -95,16 +93,21 @@ def create_bbox_image(model, image_path, save_path = None):
 
   return output_dict
 
-
-def save_all_bboxes(model, image_paths, save_path):
+f = open('log.txt', 'w')
+def save_all_bboxes(model, image_loc, save_path):
   outputs = {}
-  for path in image_paths:
+  for img in os.listdir(image_loc):
+    path = os.path.join(image_loc, img)
     try:
       outputs[path] = create_bbox_image(detection_model, path, save_path)
     except Exception as e:
       print(f"Issue: {e}")
-
+      print(img, file=f)
   return outputs
+
+output_dict = save_all_bboxes(detection_model, 
+                              config.IMAGE_COORDINATES.PATH_TO_TEST_IMAGES_DIR, 
+                              save_path=config.IMAGE_COORDINATES.SAVE_PATH)
 
 #venv
 #python models/research/object_detection/export_inference_graph.py --input_type image_tensor --pipeline_config_path workspace/training_demo/training/ssd.config --trained_checkpoint_prefix workspace/training_demo/training/model.ckpt-48684 --output_directory workspace/training_demo/trained-inference-graphs/output_inference_graph-48684.pb/      

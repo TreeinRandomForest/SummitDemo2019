@@ -1,0 +1,19 @@
+item {
+     id: 1
+     name: 'dynatrace_text'
+}
+
+item {
+     id: 2
+     name: 'dynatrace_logo'
+}
+
+item {
+     id: 3
+     name: 'ibm'
+}
+
+item {
+     id: 4
+     name: 'intel'
+}
